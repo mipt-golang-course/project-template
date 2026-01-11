@@ -60,8 +60,13 @@ jobs:
       - name: Build server binary
         run: |
           cd cmd/server
+          if [ ! -f go.mod ]; then
+            go mod init temp
+          fi
           go build -buildvcs=false -o server
-
+          if [ -f go.mod ] && grep -q "^module temp$" go.mod; then
+            rm go.mod go.sum 2>/dev/null || true
+          fi
       - name: "Code increment #1"
         if: |
           github.ref == 'refs/heads/main' ||
